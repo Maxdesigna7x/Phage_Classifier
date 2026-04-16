@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 Phage 5-Level Classification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2176ff;
+            --bg-body: #e0e5ec;
+            --bg-card: #e0e5ec;
+            --text-main: #27272a;
+            --text-muted: #52525b;
+            --text-light: #f1f5f9;
+            --success: #10b981;
+            --header-bg: #e0e5ec;
+            --shadow-out: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);
+            --shadow-in: inset 9px 9px 16px rgb(163,177,198,0.6), inset -9px -9px 16px rgba(255,255,255, 0.5);
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme='dark'] {
+            --bg-body: #121214;
+            --bg-card: #121214;
+            --text-main: #e1e1e6;
+            --text-muted: #8b8f98;
+            --header-bg: #121214;
+            --shadow-out: 10px 10px 20px #09090a, -10px -10px 20px #1b1b1e;
+            --shadow-in: inset 10px 10px 20px #09090a, inset -10px -10px 20px #1b1b1e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            scroll-behavior: smooth;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: var(--bg-body);
+            padding: 1rem 2rem;
+            display: grid;
+            grid-template-columns: 100px 1fr 100px;
+            align-items: center;
+            color: var(--text-main);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { display: flex; justify-content: center; }
+        .header-right { display: flex; justify-content: flex-end; }
+
+        .logo { font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.75rem; white-space: nowrap; }
+        .logo i { color: var(--primary); }
+
+        .btn-control {
+            background: var(--bg-card);
+            border: none;
+            color: var(--text-main);
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: var(--shadow-out);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .btn-control:hover { color: var(--primary); box-shadow: var(--shadow-in); }
+
+        .hero {
+            min-height: 50vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 8rem 2rem 4rem 2rem;
+        }
+
+        .hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--primary); max-width: 900px; }
+        .hero p { font-size: clamp(1.1rem, 2.5vw, 1.4rem); color: var(--text-muted); max-width: 800px; margin-bottom: 2rem; }
+
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-card);
+            border-radius: 15px;
+            box-shadow: var(--shadow-out);
+            font-weight: 700;
+            color: var(--text-main);
+            transition: var(--transition);
+            margin-bottom: 3rem;
+        }
+        .github-link:hover {
+            box-shadow: var(--shadow-in);
+            transform: translateY(2px);
+            color: var(--primary);
+        }
+        .github-link img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .container { max-width: 1100px; margin-left: auto; margin-right: auto; width: 100%; }
+
+        section { padding: 5rem 2rem; width: 100%; }
+        .section-header, .stat-bar, .description-text, .level-block, .image-gallery, .results-summary { 
+            max-width: 1100px; 
+            margin-left: auto; 
+            margin-right: auto; 
+        }
+        .section-header { text-align: center; margin-bottom: 3.5rem; }
+        .section-header h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-main); }
+        .section-header .line { height: 4px; width: 60px; background: var(--primary); margin: 0 auto; border-radius: 2px; }
+
+        .stat-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 5rem;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            padding: 2.5rem 1.5rem;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: var(--shadow-out);
+            transition: var(--transition);
+        }
+        .stat-card:hover { box-shadow: var(--shadow-in); transform: translateY(2px); }
+        .stat-card .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--primary); display: block; margin-bottom: 0.5rem; }
+        .stat-card .stat-label { font-size: 0.85rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
+
+        .description-text { font-size: 1.1rem; margin-bottom: 2rem; text-align: center; max-width: 850px; margin-left: auto; margin-right: auto; color: var(--text-muted); }
+
+        .level-block { 
+            margin-bottom: 3rem; padding: 2.5rem; 
+            background: var(--bg-card); border-radius: 30px; 
+            box-shadow: var(--shadow-out);
+            transition: var(--transition);
+        }
+        .level-block:hover { box-shadow: var(--shadow-in); transform: translateY(2px); }
+        .level-block h3 { color: var(--primary); margin-bottom: 1rem; font-size: 1.6rem; }
+
+        .image-gallery { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 2.5rem; 
+            margin-top: 2rem;
+        }
+        .image-card { 
+            background: var(--bg-card); border-radius: 20px; 
+            padding: 1.5rem; box-shadow: var(--shadow-out);
+            transition: var(--transition);
+            display: flex; flex-direction: column;
+        }
+        .image-card:hover { box-shadow: var(--shadow-in); transform: translateY(2px); }
+        .image-card img { 
+            border-radius: 15px; width: 100%; height: 200px; 
+            object-fit: contain; display: block; 
+            cursor: zoom-in; transition: var(--transition);
+            margin-bottom: 1.5rem;
+        }
+        .image-card img:hover { transform: scale(1.02); }
+        .image-info { padding: 0.5rem 0; }
+        .image-info h4 { color: var(--primary); margin-bottom: 0.5rem; font-size: 1.2rem; }
+        .image-info p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.4; }
+
+        .img-clickable { 
+            box-shadow: var(--shadow-out); 
+            border-radius: 20px; 
+            background: var(--bg-card);
+            padding: 15px;
+            max-width: 100%; height: auto;
+            max-height: 600px;
+            object-fit: contain; display: block; margin: 0 auto;
+            transition: var(--transition);
+            cursor: zoom-in;
+        }
+        .img-clickable:hover { box-shadow: var(--shadow-in); transform: translateY(2px); }
+
+        .results-summary { 
+            background: var(--bg-card); color: var(--text-main); 
+            padding: 3rem; border-radius: 40px; 
+            box-shadow: var(--shadow-out);
+            margin-top: 3rem; transition: var(--transition);
+        }
+        .results-summary:hover { box-shadow: var(--shadow-in); transform: translateY(2px); }
+        .best-model { border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; padding: 0.8rem 0; }
+        [data-theme='dark'] .best-model { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .best-model span:last-child { color: var(--success); font-weight: 700; }
+
+        #lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+            cursor: zoom-out;
+        }
+        #lightbox img { max-width: 90%; max-height: 90%; box-shadow: 0 0 30px rgba(0,0,0,0.5); border-radius: 4px; }
+
+        footer { 
+            background: var(--bg-body); color: var(--text-muted); 
+            padding: 4rem 2rem; text-align: center; margin-top: 4rem; 
+            box-shadow: var(--shadow-in);
+        }
+        .footer-logo { font-size: 1.5rem; color: var(--text-main); font-weight: 800; margin-bottom: 1rem; display: block; }
+        .footer-logo i { color: var(--primary); }
+
+        @media (max-width: 768px) {
+            header { 
+                padding: 0.8rem 1rem; 
+                grid-template-columns: 50px 1fr 50px;
+                gap: 0.5rem;
+            }
+            .logo { font-size: 0.9rem; gap: 0.4rem; }
+            .logo i { font-size: 1rem; }
+            .btn-control { padding: 0.4rem 0.7rem; font-size: 0.75rem; border-radius: 8px; }
+            
+            .hero { padding-top: 6rem; }
+            .image-gallery { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lightbox" onclick="this.style.display='none'">
+        <img src="" alt="Fullscreen">
+    </div>
+
+    <header>
+        <div class="header-left">
+            <button class="btn-control" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon"></i></button>
+        </div>
+        <div class="header-center">
+            <div class="logo">
+                <i class="fas fa-dna"></i>
+                PHAGE-CLASSIFIER 
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="btn-control" onclick="toggleLang()" id="langBtn">EN</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1 data-aos="fade-up" data-i18n="hero_title">Sistema Jerárquico de Clasificación Funcional de Fagos</h1>
+        <p data-aos="fade-up" data-aos-delay="100" data-i18n="hero_desc">Anotación automática de proteínas virales de alta precisión, resolviendo la materia oscura biológica con Deep Learning y embeddings densos.</p>
+        <a href="https://github.com/Maxdesigna7x/Phage-Protein-Clasification-MultiLevel" target="_blank" class="github-link" data-aos="fade-up" data-aos-delay="200">
+            <img src="github_icon_lit.png" data-light="github_icon_lit.png" data-dark="github_logo_dark.png" class="theme-img" alt="GitHub">
+            <span data-i18n="github_btn">GitHub Project</span>
+        </a>
+    </section>
+
+    <section id="about">
+        <div class="stat-bar" data-aos="fade-up">
+            <div class="stat-card"><span class="stat-value">5</span><span class="stat-label" data-i18n="stat_levels">Niveles de Análisis</span></div>
+            <div class="stat-card"><span class="stat-value">97.4%</span><span class="stat-label" data-i18n="stat_accuracy">Max. Precisión</span></div>
+            <div class="stat-card"><span class="stat-value">496k</span><span class="stat-label" data-i18n="stat_seqs">Secuencias Virales</span></div>
+            <div class="stat-card"><span class="stat-value">96k</span><span class="stat-label" data-i18n="stat_clusters">Clusters Funcionales</span></div>
+        </div>
+        <div class="section-header">
+            <h2 data-i18n="about_title">Sobre el Proyecto</h2>
+            <div class="line"></div>
+        </div>
+        <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; align-items: center;">
+            <div data-aos="fade-right">
+                <p class="description-text" style="text-align: left; margin: 0 0 1.5rem 0;" data-i18n="about_p1">
+                    Este sistema aborda la complejidad de las proteínas de fagos mediante una estructura jerárquica que combina Deep Learning con búsqueda de similitud eficiente.
+                </p>
+                <p class="description-text" style="text-align: left; margin: 0;" data-i18n="about_p2">
+                    Utilizamos embeddings de ProstT5 y arquitecturas como Conformer para identificar funciones incluso en secuencias únicas o poco comunes.
+                </p>
+            </div>
+            <div data-aos="fade-left">
+                <img src="img_resume_compress.webp" data-light="img_resume_compress.webp" data-dark="img_resume_dark_compress.webp" class="img-clickable theme-img" alt="Resumen" onclick="openLightbox(this.src)">
+            </div>
+        </div>
+    </section>
+
+    <section id="pipeline">
+        <div class="section-header">
+            <h2 data-i18n="pipe_title">Pipeline de Clasificación Jerárquica</h2>
+            <div class="line"></div>
+        </div>
+        <p class="description-text" data-i18n="pipe_intro">Nuestro flujo de trabajo se divide en 5 filtros secuenciales que actúan como un embudo de precisión biológica.</p>
+        <img src="img_pipeline_compress.webp" data-light="img_pipeline_compress.webp" data-dark="img_pipeline_dark_compress.webp" class="img-clickable theme-img" alt="Pipeline Workflow" onclick="openLightbox(this.src)" style="margin-bottom: 4rem;">
+
+        <div class="level-block" data-aos="fade-up">
+            <h3 data-i18n="l1_t">Nivel 1: Celular vs Viral</h3>
+            <div class="level-content">
+                <p data-i18n="l1_what"><strong>¿Qué se clasifica?</strong> Separación de proteínas de origen celular (huésped) de las de origen puramente viral.</p>
+                <p data-i18n="l1_why"><strong>¿Por qué?</strong> Las muestras biológicas suelen contener contaminación genómica del huésped. Este filtro asegura que el pipeline procese únicamente señales virales relevantes.</p>
+            </div>
+        </div>
+
+        <div class="level-block" data-aos="fade-up">
+            <h3 data-i18n="l2_t">Nivel 2: Fago vs Virus Eucariota</h3>
+            <div class="level-content">
+                <p data-i18n="l2_what"><strong>¿Qué se clasifica?</strong> Discriminación entre virus que infectan bacterias (Fagos) y virus que infectan células eucariotas.</p>
+                <p data-i18n="l2_why"><strong>¿Por qué?</strong> Los fagos presentan firmas genómicas y dialectos de k-mers distintos debido a sus presiones evolutivas específicas. Aquí es donde transicionamos a modelos de secuencia pura.</p>
+            </div>
+        </div>
+
+        <div class="level-block" data-aos="fade-up">
+            <h3 data-i18n="l3_t">Nivel 3: Estructural vs No Estructural</h3>
+            <div class="level-content">
+                <p data-i18n="l3_what"><strong>¿Qué se clasifica?</strong> Diferenciación entre el "chasis" físico del virus (proteínas que forman el virión) y su maquinaria metabólica/replicativa.</p>
+                <p data-i18n="l3_why"><strong>¿Por qué?</strong> Esta distinción binaria es crítica para la anotación funcional precisa, ya que permite aislar los componentes morfológicos del ruido metabólico.</p>
+            </div>
+        </div>
+
+        <div class="level-block" data-aos="fade-up">
+            <h3 data-i18n="l4_t">Nivel 4: Partes Estructurales</h3>
+            <div class="level-content">
+                <p data-i18n="l4_what"><strong>¿Qué se clasifica?</strong> Clasificación multiclase en 10 categorías morfológicas (Cápside, Cola, Portal, Baseplate, etc.).</p>
+                <p data-i18n="l4_why"><strong>¿Por qué?</strong> Define la arquitectura fundamental del virus. Es el nivel de anotación más detallado para entender cómo está construido el fago.</p>
+            </div>
+        </div>
+
+        <div class="level-block" data-aos="fade-up">
+            <h3 data-i18n="l5_t">Nivel 5: Gestión de Materia Oscura (Clusters)</h3>
+            <div class="level-content">
+                <p data-i18n="l5_what"><strong>¿Qué se clasifica?</strong> Asignación funcional de alta resolución mediante la creación de clusters por similitud de embeddings.</p>
+                <p data-i18n="l5_why"><strong>¿Por qué?</strong> Es el nivel más complejo. Resolvemos el problema de los 'singletons' (proteínas únicas) agrupándolas por su 'significado' biológico capturado en el espacio latente de ProstT5.</p>
+                <p data-i18n="l5_how"><strong>Metodología:</strong> Se generan clusters de similitud y se utiliza <strong>FAISS</strong> para realizar búsquedas One-Shot. Una secuencia consulta se asigna a un cluster mediante el método de vecino más cercano (<strong>NN</strong>) o por distancia al <strong>Centroide</strong> del cluster, permitiendo anotar funciones que las herramientas tradicionales ignoran.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="architectures">
+        <div class="section-header">
+            <h2 data-i18n="models_title">Arquitecturas Usadas</h2>
+            <div class="line"></div>
+        </div>
+        <div class="image-gallery">
+            <div class="image-card" data-aos="zoom-in">
+                <img src="img_Prost_embedding_compress.webp" data-light="img_Prost_embedding_compress.webp" data-dark="img_Prost_embedding_dark_compress.webp" class="theme-img" onclick="openLightbox(this.src)">
+                <div class="image-info">
+                    <h4 data-i18n="m1_t">Embeddings ProstT5</h4>
+                    <p data-i18n="m1_d">Traduce secuencias en vectores matemáticos densos de 1024D que capturan el contexto evolutivo.</p>
+                </div>
+            </div>
+            <div class="image-card" data-aos="zoom-in" data-aos-delay="100">
+                <img src="img_ConFormer_compress.webp" data-light="img_ConFormer_compress.webp" data-dark="img_ConFormer_dark_compress.webp" class="theme-img" onclick="openLightbox(this.src)">
+                <div class="image-info">
+                    <h4 data-i18n="m2_t">Conformer</h4>
+                    <p data-i18n="m2_d">Arquitectura de vanguardia que combina la atención global de Transformers con convoluciones locales.</p>
+                </div>
+            </div>
+            <div class="image-card" data-aos="zoom-in">
+                <img src="img_CNN_1D_OneHotEncoding_compress.webp" data-light="img_CNN_1D_OneHotEncoding_compress.webp" data-dark="img_CNN_1D_OneHotEncoding_dark_compress.webp" class="theme-img" onclick="openLightbox(this.src)">
+                <div class="image-info">
+                    <h4 data-i18n="m3_t">CNN 1D (One-Hot)</h4>
+                    <p data-i18n="m3_d">Detector de motivos conservados y patrones químicos locales en la secuencia primaria.</p>
+                </div>
+            </div>
+            <div class="image-card" data-aos="zoom-in" data-aos-delay="100">
+                <img src="img_Transformer_kmer_compress.webp" data-light="img_Transformer_kmer_compress.webp" data-dark="img_Transformer_kmer_dark_compress.webp" class="theme-img" onclick="openLightbox(this.src)">
+                <div class="image-info">
+                    <h4 data-i18n="m4_t">Transformer + K-mers</h4>
+                    <p data-i18n="m4_d">Enfoque atencional para capturar dependencias a largo plazo y sesgos genómicos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="results">
+        <div class="section-header">
+            <h2 data-i18n="results_title">Análisis de Resultados</h2>
+            <div class="line"></div>
+        </div>
+        <img src="img_results_compress.webp" data-light="img_results_compress.webp" data-dark="img_results_dark_compress.webp" class="img-clickable theme-img" alt="Gráfica General" onclick="openLightbox(this.src)" style="margin-bottom: 3rem;">
+        
+        <div class="results-summary" data-aos="fade-up">
+            <h3 data-i18n="res_summary_t">Resumen de Modelos Ganadores</h3>
+            <div class="best-model"><span>Nivel 1: Celular vs Viral</span><span>MLP (Embeddings) - 90.80%</span></div>
+            <div class="best-model"><span>Nivel 2: Fago vs Eucariota</span><span>Conformer (Sequence) - 91.23%</span></div>
+            <div class="best-model"><span>Nivel 3: Estructural vs No</span><span>MLP (Embeddings) - 97.40%</span></div>
+            <div class="best-model"><span>Nivel 4: Partes Estructurales</span><span>MLP (Embeddings) - 93.09%</span></div>
+            <div class="best-model"><span>Nivel 5: Auditoría Clusters</span><span>FAISS NN_Loc - 90.00%</span></div>
+            <p style="margin-top: 2rem; font-size: 0.95rem; opacity: 0.8;" data-i18n="res_footer">La transición a modelos de secuencia pura (Conformer) en el Nivel 2 es clave para detectar firmas genómicas de huésped.</p>
+        </div>
+    </section>
+
+    <footer>
+        <span class="footer-logo"><i class="fas fa-dna"></i> PHAGE-CLASSIFIER</span>
+        <p data-i18n="footer_text">Sistema Jerárquico de Clasificación Funcional de Fagos.</p>
+        <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1.5rem;">
+            <a href="https://github.com/Maxdesigna7x/Phage-Protein-Clasification-MultiLevel" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+            <a href="https://maxdesigna7x.github.io/Portfolio_Randy/" target="_blank" title="Portfolio"><i class="fas fa-briefcase"></i></a>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', theme);
+            document.getElementById('themeBtn').innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            
+            document.querySelectorAll('.theme-img').forEach(img => {
+                img.src = theme === 'dark' ? img.getAttribute('data-dark') : img.getAttribute('data-light');
+            });
+        }
+
+        function openLightbox(src) {
+            const lb = document.getElementById('lightbox');
+            lb.querySelector('img').src = src;
+            lb.style.display = 'flex';
+        }
+
+        const i18n = {
+            es: {
+                hero_title: "Sistema Jerárquico de Clasificación Funcional de Fagos",
+                hero_desc: "Anotación automática de proteínas virales con Deep Learning y embeddings densos.",
+                github_btn: "Proyecto en GitHub",
+                stat_levels: "Niveles de Análisis", stat_accuracy: "Max. Precisión", stat_seqs: "Secuencias Virales", stat_clusters: "Clusters Funcionales",
+                about_title: "Sobre el Proyecto",
+                about_p1: "Este sistema aborda la complejidad de las proteínas de fagos mediante una estructura jerárquica que combina Deep Learning con búsqueda de similitud eficiente.",
+                about_p2: "Utilizamos embeddings de ProstT5 y arquitecturas como Conformer para identificar funciones incluso en secuencias únicas o poco comunes.",
+                pipe_title: "Pipeline de Clasificación Jerárquica",
+                pipe_intro: "Nuestro flujo de trabajo se divide en 5 filtros secuenciales que actúan como un embudo de precisión biológica.",
+                l1_t: "Nivel 1: Celular vs Viral", l1_what: "¿Qué se clasifica? Separación de proteínas de origen celular de las de origen viral.", l1_why: "¿Por qué? Filtro necesario para descartar secuencias del huésped.",
+                l2_t: "Nivel 2: Fago vs Virus Eucariota", l2_what: "¿Qué se clasifica? Discriminación entre fagos y virus eucariotas.", l2_why: "¿Por qué? Los fagos tienen firmas genómicas únicas.",
+                l3_t: "Nivel 3: Estructural vs No Estructural", l3_what: "¿Qué se clasifica? Diferenciación entre el chasis del virus y maquinaria metabólica.", l3_why: "¿Por qué? Aísla componentes morfológicos del ruido metabólico.",
+                l4_t: "Nivel 4: Partes Estructurales", l4_what: "¿Qué se clasifica? Clasificación en 10 categorías morfológicas.", l4_why: "¿Por qué? Define la arquitectura fundamental del virión.",
+                l5_t: "Nivel 5: Gestión de Materia Oscura (Clusters)", l5_what: "¿Qué se clasifica? Asignación funcional mediante clusters de embeddings.", l5_why: "¿Por qué? Resolvemos singletons agrupándolos por su 'significado' biológico.", l5_how: "Metodología: Se utilizan clusters y FAISS para búsquedas One-Shot. Una secuencia se asigna mediante NN o Centroide, anotando funciones que herramientas tradicionales ignoran.",
+                models_title: "Arquitecturas Usadas",
+                m1_t: "Embeddings ProstT5", m1_d: "Vectores densos de 1024D que capturan el contexto evolutivo.",
+                m2_t: "Conformer", m2_d: "Combina atención global con convoluciones locales.",
+                m3_t: "CNN 1D (One-Hot)", m3_d: "Detector de motivos conservados y patrones químicos.",
+                m4_t: "Transformer + K-mers", m4_d: "Captura dependencias a largo plazo y sesgos genómicos.",
+                results_title: "Análisis de Resultados",
+                res_summary_t: "Resumen de Modelos Ganadores",
+                res_footer: "La transición a modelos de secuencia pura (Conformer) en el Nivel 2 es clave.",
+                footer_text: "Sistema Jerárquico de Clasificación Funcional de Fagos."
+            },
+            en: {
+                hero_title: "Hierarchical Phage Functional Classification System",
+                hero_desc: "Automated viral protein annotation using Deep Learning and dense embeddings.",
+                github_btn: "GitHub Project",
+                stat_levels: "Analysis Levels", stat_accuracy: "Max. Accuracy", stat_seqs: "Viral Sequences", stat_clusters: "Functional Clusters",
+                about_title: "About the Project",
+                about_p1: "This system addresses phage protein complexity through a hierarchical structure.",
+                about_p2: "We use ProstT5 embeddings and architectures like Conformer to identify functions.",
+                pipe_title: "Hierarchical Classification Pipeline",
+                pipe_intro: "Our workflow is divided into 5 sequential filters.",
+                l1_t: "Level 1: Cellular vs Viral", l1_what: "What is classified? Separation of host and viral proteins.", l1_why: "Why? Necessary to discard host contamination.",
+                l2_t: "Level 2: Phage vs Eukaryotic Virus", l2_what: "What is classified? Discrimination between bacterial and eukaryotic viruses.", l2_why: "Why? Phages have unique genomic signatures.",
+                l3_t: "Level 3: Structural vs Non-Structural", l3_what: "What is classified? Differentiation between chassis and machinery.", l3_why: "Why? Isolates morphological components.",
+                l4_t: "Level 4: Structural Parts", l4_what: "What is classified? Classification into 10 morphological categories.", l4_why: "Why? Defines fundamental virion architecture.",
+                l5_t: "Level 5: Dark Matter Management", l5_what: "What is classified? Functional assignment via embedding clusters.", l5_why: "Why? Resolves singletons by biological 'meaning'.", l5_how: "Methodology: Similarity clusters and FAISS for One-Shot search using NN or Centroid methods.",
+                models_title: "Used Architectures",
+                m1_t: "ProstT5 Embeddings", m1_d: "1024D dense vectors capturing evolutionary context.",
+                m2_t: "Conformer", m2_d: "Combines global attention with local convolutions.",
+                m3_t: "CNN 1D (One-Hot)", m3_d: "Detector of conserved motifs and chemical patterns.",
+                m4_t: "Transformer + K-mers", m4_d: "Captures long-term dependencies and genomic biases.",
+                results_title: "Results Analysis",
+                res_summary_t: "Winner Models Summary",
+                res_footer: "Transitioning to pure sequence models (Conformer) in Level 2 is key.",
+                footer_text: "Hierarchical Phage Functional Classification System."
+            }
+        };
+
+        let currentLang = 'es';
+        function toggleLang() {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            document.getElementById('langBtn').innerText = currentLang === 'es' ? 'EN' : 'ES';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const i18nObj = i18n[currentLang][key];
+                if (i18nObj) el.innerHTML = i18nObj;
+            });
+        }
+    </script>
+</body>
+</html>
